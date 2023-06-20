@@ -115,44 +115,41 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
+        pattern = """(^\w+)((?:\s+\w+=[^\s]+)+)?"""
+        m = re.match(pattern, args)
+        args = [s for s in m.groups() if s] if m else []
+
         if not args:
             print("** class name missing **")
             return
-	params = args.split(" ")
-	class_name = params[0]
 
+        className = args[0]
 
-	elif args not in HBNBCommand.classes:
-        	print("** class doesn't exist **")
-        	return
-	
-	cls = HBNBCommand.classes[class_name]
-	obj_params = {}
+        if className not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
 
-	for param in params[1:]:
-		if "=" not in param:
-			continue
-	
-		key, value = param.split("=")
-		value = value.replace("_", " ")
-	
-		if value.startswith('"') and value.endswith('"'):
-			value = value[1:-1]
+        kwargs = dict()
+        if len(args) > 1:
+            params = args[1].split(" ")
+            params = [param for param in params if param]
+            for param in params:
+                [name, value] = param.split("=")
+                if value[0] == '"' and value[-1] == '"':
+                    value = value[1:-1].replace('_', ' ')
+                elif '.' in value:
+                    value = float(value)
+                else:
+                    value = int(value)
+                kwargs[name] = value
 
-		try:
-			if "." in value:
-				value = float(value)
-			else:
-				value = int(value)
-		except ValueError:
-			continue
-	
-		obj_params[key] = value
+        new_instance = HBNBCommand.classes[className]()
+        
+        for attrName, attrValue in kwargs.items():
+            setattr(new_instance, attrName, attrValue) 
 
-        new_instance = cls(**obj_params)
-        storage.save()
+        new_instance.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
