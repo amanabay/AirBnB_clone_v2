@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 """ Console Module """
+
 import cmd
 import sys
+import re
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -73,7 +75,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -144,9 +146,9 @@ class HBNBCommand(cmd.Cmd):
                 kwargs[name] = value
 
         new_instance = HBNBCommand.classes[className]()
-        
+
         for attrName, attrValue in kwargs.items():
-            setattr(new_instance, attrName, attrValue) 
+            setattr(new_instance, attrName, attrValue)
 
         new_instance.save()
         print(new_instance.id)
@@ -158,7 +160,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, args):
         """ Method to show an individual object """
-	        new = args.partition(" ")
+        new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
 
@@ -344,6 +346,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
