@@ -118,10 +118,38 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
+	params = args.split(" ")
+	class_name = params[0]
+
+
+	elif args not in HBNBCommand.classes:
+        	print("** class doesn't exist **")
+        	return
+	
+	cls = HBNBCommand.classes[class_name]
+	obj_params = {}
+
+	for param in params[1:]:
+		if "=" not in param:
+			continue
+	
+		key, value = param.split("=")
+		value = value.replace("_", " ")
+	
+		if value.startswith('"') and value.endswith('"'):
+			value = value[1:-1]
+
+		try:
+			if "." in value:
+				value = float(value)
+			else:
+				value = int(value)
+		except ValueError:
+			continue
+	
+		obj_params[key] = value
+
+        new_instance = cls(**obj_params)
         storage.save()
         print(new_instance.id)
         storage.save()
@@ -133,7 +161,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, args):
         """ Method to show an individual object """
-        new = args.partition(" ")
+	        new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
 
