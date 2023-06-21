@@ -3,12 +3,13 @@
 from models.base_model import BaseModel, Base
 from models.amenity import Amenity
 import models
+from os import getenv
 from models.review import Review
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Table
 
 
-if models.is_type == "db":
+if getenv("HBNB_TYPE_STORAGE") == "db":
     relationship_table = Table('place_amenity', Base.metadata,
                                Column('place_id', String(60),
                                       ForeignKey('places.id'),
