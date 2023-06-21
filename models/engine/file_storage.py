@@ -16,7 +16,7 @@ class FileStorage:
         result = {}
 
         for key, value in self.__objects.items():
-            if isinstance(value, cls):
+            if (key.split(".")[0] == cls.__name__):
                 result[key] = value
 
         return result
