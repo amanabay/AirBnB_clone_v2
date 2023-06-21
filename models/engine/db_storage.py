@@ -1,11 +1,9 @@
 #!/usr/bin/python3
-"""This module defines a class to manage db storage for hbnb clone"""
+"""Class to manage db storage for hbnb clone"""
 from os import getenv
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import (create_engine)
 from sqlalchemy.orm import sessionmaker, scoped_session
-import models
 from models.base_model import Base
-from models.base_model import BaseModel
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -25,46 +23,44 @@ class DBStorage:
         pwd = getenv("HBNB_MYSQL_PWD")
         host = getenv("HBNB_MYSQL_HOST")
         db = getenv("HBNB_MYSQL_DB")
-        envv = getenv("HBNB_ENV", "none")
 
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
             user, pwd, host, db), pool_pre_ping=True)
 
-        if envv == 'test':
+        if getenv("HBNB_ENV") == 'test':
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """returns a dictionary
-        Return:
-            returns a dictionary of __object
-        """
-        dic = {}
+
+        dictionary = {}
+
         if cls:
             if type(cls) is str:
                 cls = eval(cls)
-            query = self.__session.query(cls)
-            for elem in query:
-                key = "{}.{}".format(type(elem).__name__, elem.id)
-                dic[key] = elem
+            result = self.__session.query(cls)
+
+            dictionary = {"{}.{}".format(type(row).__name__,
+                                         row.id): row for row in result}
         else:
-            lista = [State, City, User, Place, Review, Amenity]
-            for clase in lista:
-                query = self.__session.query(clase)
-                for elem in query:
-                    key = "{}.{}".format(type(elem).__name__, elem.id)
-                    dic[key] = elem
-        return (dic)
+            class_list = [State, City, User, Place, Review, Amenity]
+
+            for c in class_list:
+                result = self.__session.query(c)
+
+                dictionary = {"{}.{}".format(type(row).__name__,
+                                             row.id): row for row in result}
+        return dictionary
 
     def new(self, obj):
-        """add the object to the current database session"""
+        """Add object to the current database session"""
         self.__session.add(obj)
 
     def save(self):
-        """commit all changes of the current database session"""
+        """Commit all changes of the current database session"""
         self.__session.commit()
 
     def delete(self, obj=None):
-        """delete from the current database session obj if not None"""
+        """Delete from the current database session obj if not None"""
         if obj is not None:
             self.__session.delete(obj)
 
@@ -77,5 +73,5 @@ class DBStorage:
         self.__session = Session()
 
     def close(self):
-        """Remove session"""
+        """Close session"""
         self.__session.close()
