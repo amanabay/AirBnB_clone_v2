@@ -1,22 +1,18 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
-from models.amenity import Amenity
 import models
 from os import getenv
-from models.review import Review
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Table
 
-
-if getenv("HBNB_TYPE_STORAGE") == "db":
-    relationship_table = Table('place_amenity', Base.metadata,
-                               Column('place_id', String(60),
-                                      ForeignKey('places.id'),
-                                      nullable=False),
-                               Column('amenity_id', String(60),
-                                      ForeignKey('amenities.id'),
-                                      nullable=False))
+place_amenity = Table('place_amenity', Base.metadata,
+                      Column('place_id', String(60),
+                             ForeignKey('places.id'),
+                             nullable=False),
+                      Column('amenity_id', String(60),
+                             ForeignKey('amenities.id'),
+                             nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -32,8 +28,9 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, default=0, nullable=False)
     latitude = Column(Float)
     longitude = Column(Float)
-    reviews = relationship('Review', backref='place', cascade='delete')
-    amenities = relationship('Amenity', secondary=relationship_table,
+    reviews = relationship('models.review.Review', backref='place',
+                           cascade='delete')
+    amenities = relationship('models.amenity.Amenity', secondary=place_amenity,
                              viewonly=False)
     amenity_ids = []
 
@@ -41,17 +38,17 @@ class Place(BaseModel, Base):
         @property
         def reviews(self):
             """ Place reviews """
-            rv = models.storage.all(Review).values()
+            rv = models.storage.all(models.review.Review).values()
             return {re for re in rv if re.place_id == self.id}
 
         @property
         def amenities(self):
             """ Place amenities """
-            ob = models.storage.all(Amenity).values()
+            ob = models.storage.all(models.amenity.Amenity).values()
             return [obj for obj in ob if obj.id in self.amenity_ids]
 
         @amenities.setter
         def amenities(self, value):
             """ Amenities setter """
-            if type(value) is Amenity:
+            if type(value) is models.amenity.Amenity:
                 self.amenity_ids.append(value.id)
