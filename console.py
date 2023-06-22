@@ -120,22 +120,18 @@ class HBNBCommand(cmd.Cmd):
             if not arg_string:
                 raise SyntaxError()
 
-            # Split the argument string into class name and attribute-value pairs
             split_args = arg_string.split(' ')
             class_name = split_args[0]
             attribute_pairs = split_args[1:]
 
-            # Instantiate a new object of the specified class
             new_instance = eval('{}()'.format(class_name))
 
-            # Set object attributes based on attribute-value pairs
             for attr_pair in attribute_pairs:
                 attr_name, attr_value = attr_pair.split('=')
-                verified_value = HBNBCommand.verify_attribute(attr_value)
-                if verified_value is not None:
-                    setattr(new_instance, attr_name, verified_value)
+                check_value = HBNBCommand.check_attr(attr_value)
+                if check_value is not None:
+                    setattr(new_instance, attr_name, check_value)
 
-            # Save the new object to the database
             new_instance.save()
             print(new_instance.id)
 
@@ -149,9 +145,9 @@ class HBNBCommand(cmd.Cmd):
             print("** Error creating object: {} **".format(str(e)))
 
     @classmethod
-    def verify_attribute(cls, attribute):
+    def check_attr(cls, attribute):
         """
-            Verify if the attribute is correctly formatted
+            Checks if attribute is valid
         """
         if attribute[0] is attribute[-1] in ['"', "'"]:
             return attribute.strip('"\'').replace('_', ' ').replace('\\', '"')
