@@ -67,11 +67,12 @@ class DBStorage:
     def reload(self):
         """Create current database session from the engine
         using a sessionmaker"""
-        self.__session = Base.metadata.create_all(self.__engine)
+        Base.metadata.create_all(self.__engine)
         factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(factory)
         self.__session = Session()
 
     def close(self):
         """Close session"""
-        self.__session.close()
+        if self.__session():
+            self.__session.close()
