@@ -29,7 +29,7 @@ def c(text):
         Display “C ” followed by the value of the text variable
     """
     text = text.replace("_", " ")
-    return f"C is {text}"
+    return f"C {text}"
 
 
 if __name__ == "__main__":
