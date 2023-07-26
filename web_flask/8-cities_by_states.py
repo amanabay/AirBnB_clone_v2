@@ -3,7 +3,7 @@
 """
     Starts web application listening on 0.0.0.0, port 5000
     routes:
-        /states_list: list of all states in storage models
+        /cities_by_states: lists cities found in states
 """
 from models import storage
 from flask import Flask, render_template
