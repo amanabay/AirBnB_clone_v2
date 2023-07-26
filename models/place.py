@@ -7,10 +7,12 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Table
 
 place_amenity = Table('place_amenity', Base.metadata,
-                      Column('place_id', String(60),
+                      Column('place_id',
+                             String(60),
                              ForeignKey('places.id'),
                              nullable=False),
-                      Column('amenity_id', String(60),
+                      Column('amenity_id',
+                             String(60, collation='latin1_swedish_ci'),
                              ForeignKey('amenities.id'),
                              nullable=False))
 
@@ -18,7 +20,8 @@ place_amenity = Table('place_amenity', Base.metadata,
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = 'places'
-    city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
+    city_id = Column(String(60, collation='latin1_swedish_ci'),
+                     ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
     description = Column(String(1024))
